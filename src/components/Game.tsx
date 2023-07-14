@@ -61,8 +61,8 @@ const Game = () => {
           };
 
 					if (
-						currentScore < 600 &&
-						newScore < 600
+						newScore < 600 &&
+						state.scores[player].length === 1
 					){
             toast.error("Initial score must be at least 600")
 						return { ...state.scores };}
