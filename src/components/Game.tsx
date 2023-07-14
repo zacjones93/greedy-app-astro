@@ -11,13 +11,10 @@ type GameState = "Set up" | "inProgress" | "last round" | "complete";
 */
 
 const gameObject = {
-	state: "inProgress",
+	state: "Set up",
 	winner: "",
 	scores: {
-    zac: [0],
-    mariah: [0],
-    bill: [0],
-    chrisy: [0],
+    
   },
 };
 
@@ -96,7 +93,6 @@ const Game = () => {
       [currPlayer]: newScores 
     }
   }, {})
-  console.log({displayScores})
   const currentPlayerScores: any = Object.keys(displayScores).reduce((prev, curr) => {
     return {
       ...prev,
@@ -171,31 +167,32 @@ const Game = () => {
 		<div className="flex flex-wrap sm:flex-nowrap self-center justify-between h-full w-full gap-4 text-black">
       <Toaster />
 			{game.state === "Set up" && (
-				<div className="flex flex-col justify-between h-full gap-4">
+				<div className="flex flex-col justify-between h-full gap-4 mx-auto">
 					<h2 className="text-2xl">Add how many players you'd like to keep track of 👇</h2>
-					<form onSubmit={handleCreationSubmit} className="w-fit mx-auto" id="setup-form">
-						<div className="mb-4 space-x-4 w-fit mx-auto">
+					<form onSubmit={handleCreationSubmit} className="flex" id="setup-form">
+						<div className="mb-4  mx-auto flex flex-col gap-4">
 							<button
-								className="px-4 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
+								className="px-20 py-4 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
 								type="button"
 								onClick={() => addSetUpFormFields()}
 							>
 								Add
 							</button>
 							<button
-								className="bg-blue-500 px-4 rounded text-white"
+								className="bg-blue-500 px-20 py-4  rounded text-white ml-0 hover:opacity-80"
 								type="submit"
 							>
 								Submit
 							</button>
 						</div>
+            <div className="flex flex-col">
 						{setUpFormValues.map((element, index) => (
 							<div className="flex flex-row gap-2 mt-2 relative " key={index}>
 								<label className="self-center shrink-0">Player {index + 1}</label>
 								<input
 									type="text"
 									name="name"
-                  className="w-full bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500"
+                  className="w-full h-fit self-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500"
 									value={element.name || ""}
 									onChange={(e) => handleSetUpChange(index, e)}
 								/>
@@ -211,6 +208,7 @@ const Game = () => {
 								) : null}
 							</div>
 						))}
+            </div>
 					</form>
 				</div>
 			)}
