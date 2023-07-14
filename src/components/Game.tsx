@@ -167,10 +167,10 @@ const Game = () => {
 		<div className="flex flex-wrap sm:flex-nowrap self-center justify-between h-full w-full gap-4 text-black">
       <Toaster />
 			{game.state === "Set up" && (
-				<div className="flex flex-col justify-between h-full gap-4 mx-auto">
-					<h2 className="text-2xl">Add how many players you'd like to keep track of 👇</h2>
-					<form onSubmit={handleCreationSubmit} className="flex" id="setup-form">
-						<div className="mb-4  mx-auto flex flex-col gap-4">
+				<div className="flex flex-col justify-between w-full h-full gap-4 mx-auto">
+					<h2 className="text-2xl text-center">Add how many players you'd like to keep track of 👇</h2>
+					<form onSubmit={handleCreationSubmit} className="flex flex-wrap sm:flex-wrap-0 justify-evenly" id="setup-form">
+						<div className="mb-4 flex flex-col gap-4">
 							<button
 								className="px-20 py-4 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
 								type="button"
@@ -187,7 +187,7 @@ const Game = () => {
 						</div>
             <div className="flex flex-col">
 						{setUpFormValues.map((element, index) => (
-							<div className="flex flex-row gap-2 mt-2 relative " key={index}>
+							<div className="flex flex-col sm:flex-row gap-2 mt-2 relative " key={index}>
 								<label className="self-center shrink-0">Player {index + 1}</label>
 								<input
 									type="text"
@@ -200,7 +200,7 @@ const Game = () => {
 								{index ? (
 									<button
 										type="button"
-										className="absolute -right-[6.5rem] py-2 px-4 border-2 rounded border-gray-500 hover:text-red-500 hover:border-red-500"
+										className="absolute -right-[6.5rem] top-8 sm:top-0  py-2 px-4 border-2 rounded border-gray-500 hover:text-red-500 hover:border-red-500"
 										onClick={() => removeSetUpFormFields(index)}
 									>
 										Remove
