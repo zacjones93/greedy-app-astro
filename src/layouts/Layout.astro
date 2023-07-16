@@ -2,10 +2,19 @@
 export interface Props {
 	title: string;
 }
+import { supabase } from '../lib/supabase';
+
 
 const { title } = Astro.props;
----
 
+const sessionCookie = Astro.cookies.get("session")
+const parsedSession = JSON.parse(sessionCookie.value || "{}")
+const session = await supabase.auth.getUser(parsedSession.access_token)
+const user = session.data.user
+
+
+
+---
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -16,10 +25,33 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
+  <nav class="flex justify-end m-4">
+    {
+      user ? (
+        <div class="flex gap-4">
+        <p class="self-center">{user.email}</p>
+        <a
+          class="signout self-end px-4 py-2 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
+          href="/logout"
+        >
+          log out
+        </a>
+      </div>
+      ) : (
+        <a
+          class="px-4 py-2 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
+          href="/login"
+        >
+          log in
+        </a>
+      )
+    }
+  </nav>
 	<body>
 		<slot />
 	</body>
 </html>
+
 <style is:global>
 	:root {
 		--accent: 124, 58, 237;

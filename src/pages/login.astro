@@ -1,0 +1,54 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { signInWithEmail } from '../lib/auth'
+import { supabase } from "../lib/supabase";
+
+let logInError = null
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const email = data.get("email") as string;
+    const password = data.get("password") as string
+    // Do something with the data
+
+    const {data: userData, error} = await signInWithEmail(email, password)
+
+    if (error) {
+      logInError = error.message
+      throw error
+    }
+    if(userData.user) Astro.cookies.set("user", userData.user)
+    Astro.cookies.set("session", JSON.stringify(userData.session))
+    return Astro.redirect("/")
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout title="Welcome to Astro.">
+  <div class="w-fit mx-auto border-2 border-gray-500 rounded p-4">
+    <h1 class=" text-2xl">Log in to Greedy App.</h1>
+    <form class="w-96 my-4" method="POST">
+      
+      <div class="flex flex-col m">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" required class="bg-gray-50 rounded p-2" />
+      </div>
+      <div class="flex flex-col">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required class="bg-gray-50 rounded p-2" />
+      </div>
+      <button type="submit" class=" px-4 py-2 mt-4 bg-blue-500 rounded hover:opacity-80 text-white ">Log in</button>
+    </form>
+    <div class="flex flex-col gap-4">
+      <span class="">need an account? <a href="/" class="text-blue-500 underline">Sign up</a></span>
+      {logInError && (<span class="text-red-500">{logInError}, try again</span>)}
+    </div>
+  </div>
+  
+</Layout>

@@ -1,57 +1,98 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
-import Game from '../components/Game';
+import Layout from "../layouts/Layout.astro";
+import Game from "../components/Game";
+import { getUser } from "@lib/auth";
+import { supabase } from "../lib/supabase";
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const email = data.get("email") as string;
+    const password = data.get("password") as string
+    // Do something with the data
+
+    const {data: userData, error} = await supabase.auth.signUp({
+    email,
+    password}
+    )
+
+    if (error) {
+      throw error
+    }
+    if (userData?.user) Astro.cookies.set("user", userData.user)
+    return Astro.redirect("/check-your-email")
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+// let apiUser = getUser(Astro.request)
+
+let user = null
+const sessionCookie = Astro.cookies.get("session")
+const accessToken = Astro.cookies.get("access_token")
+console.log(accessToken)
+const parsedSession = JSON.parse(sessionCookie.value || "{}")
+if(parsedSession) {
+  console.log(sessionCookie)
+  const session = await supabase.auth.getUser(parsedSession.access_token)
+  user = session.data.user
+}
+
+
 
 
 ---
 
 <Layout title="Welcome to Astro.">
-	<main class=" max-w-4xl">
-    <Game client:only="react"/>
-	</main>
+
+  <main class="max-w-4xl mx-auto">
+    {
+      user !== null ? (
+        <Game client:only="react" />
+        
+      ) : (
+        <div class="w-fit mx-auto border-2 border-gray-500 rounded p-4">
+          <h1 class=" text-2xl">Sign up for the Greedy App.</h1>
+          <form class="w-96 my-4"  method="POST">
+            
+            <div class="flex flex-col m">
+              <label for="email">Email</label>
+              <input id="email" type="email" name="email" class="bg-gray-50 rounded p-2" />
+            </div>
+            <div class="flex flex-col">
+              <label for="password">Password</label>
+              <input id="password" type="password" name="password" class="bg-gray-50 rounded p-2" />
+            </div>
+            <button type="submit" class=" px-4 py-2 mt-4 bg-blue-500 rounded hover:opacity-80 text-white ">Sign up</button>
+          </form>
+          <span class="">already signed up? <a href="/login" class="text-blue-500 underline">Log in</a></span>
+        </div>
+      )
+    }
+  </main>
 </Layout>
 
-<style>
-	main {
-		margin: auto;
-		padding: 1.5rem;
-	}
-	h1 {
-		font-size: 3rem;
-		font-weight: 800;
-		margin: 0;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.instructions {
-		line-height: 1.6;
-		margin: 1rem 0;
-		border: 1px solid rgba(var(--accent), 25%);
-		background-color: white;
-		padding: 1rem;
-		border-radius: 0.4rem;
-	}
-	.instructions code {
-		font-size: 0.875em;
-		font-weight: bold;
-		background: rgba(var(--accent), 12%);
-		color: rgb(var(--accent));
-		border-radius: 4px;
-		padding: 0.3em 0.45em;
-	}
-	.instructions strong {
-		color: rgb(var(--accent));
-	}
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 1rem;
-		padding: 0;
-	}
-</style>
+<script>
+
+  const vals = window.location.hash.substring(1).split("&").map(kv => kv.split("="))
+  const hashParameters = new Map(vals as any) 
+  if(hashParameters.get('access_token')){ 
+    const data = await fetch("/api/login", {
+      method: "POST",
+      headers: new Headers({"Content-Type": "application/json"}),
+      credentials: "same-origin",
+      body: JSON.stringify({
+          access_token: hashParameters.get('access_token'),
+          expires_in: hashParameters.get('expires_in'),
+          refresh_token: hashParameters.get('refresh_token'),
+      }),
+  })
+
+  }
+
+
+</script>
