@@ -1,8 +1,8 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Game from "../components/Game";
+import Layout from "@layouts/Layout.astro";
+import Game from "@components/Game";
 import { getUser } from "@lib/auth";
-import { supabase } from "../lib/supabase";
+import { supabase } from "@lib/supabase";
 
 if (Astro.request.method === "POST") {
   try {
@@ -77,7 +77,6 @@ if(parsedSession) {
 </Layout>
 
 <script>
-
   const vals = window.location.hash.substring(1).split("&").map(kv => kv.split("="))
   const hashParameters = new Map(vals as any) 
   if(hashParameters.get('access_token')){ 
