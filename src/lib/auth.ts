@@ -1,4 +1,5 @@
 import { supabase } from "@lib/supabase";
+import { parse } from 'cookie';
 
 
 export async function signInWithEmail(email: string, password: string) {
@@ -11,13 +12,11 @@ export async function signInWithEmail(email: string, password: string) {
 }
 
 export const getUser = async (req: Request) => {
-  let user = await fetch('/api/auth/user', {
-    method: 'GET',
-    headers: new Headers({ 'Content-Type': 'application/json'}),
-  })
-
-  console.log("from fetch",user)
-
+  const cookies = parse(req.headers.get('cookie') || '')
+  if (!cookies.access_token) return null
+  const session = JSON.parse(cookies.session)
+  const mySession = await supabase.auth.getUser(session.access_token)
+  return mySession.data.user
 }
 
 export async function signOut() {

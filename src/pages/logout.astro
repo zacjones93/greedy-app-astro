@@ -4,6 +4,6 @@ import { supabase } from "@lib/supabase"
 await supabase.auth.signOut()
 Astro.cookies.delete("session")
 Astro.cookies.delete("user")
-Astro.cookies.delete("token")
+Astro.cookies.delete("access_token")
 return Astro.redirect("/login")
 ---

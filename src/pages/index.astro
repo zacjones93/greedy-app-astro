@@ -29,21 +29,7 @@ if (Astro.request.method === "POST") {
   }
 }
 
-// let apiUser = getUser(Astro.request)
-
-let user = null
-const sessionCookie = Astro.cookies.get("session")
-const accessToken = Astro.cookies.get("access_token")
-console.log(accessToken)
-const parsedSession = JSON.parse(sessionCookie.value || "{}")
-if(parsedSession) {
-  console.log(sessionCookie)
-  const session = await supabase.auth.getUser(parsedSession.access_token)
-  user = session.data.user
-}
-
-
-
+let user = await getUser(Astro.request)
 
 ---
 

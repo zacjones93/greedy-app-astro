@@ -20,6 +20,7 @@ if (Astro.request.method === "POST") {
     }
     if(userData.user) Astro.cookies.set("user", userData.user)
     Astro.cookies.set("session", JSON.stringify(userData.session))
+    Astro.cookies.set("access_token", JSON.stringify(userData.session?.access_token))
     return Astro.redirect("/")
 
   } catch (error) {
