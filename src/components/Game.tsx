@@ -3,15 +3,12 @@ import toast, { Toaster } from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 import cx from "classnames";
 type GameState = "Set up" | "inProgress" | "last round" | "complete";
+type GameType = "greedy" | "farkle" | "10 crowns";
 
-/*
-!TODO:
-  - refactor to store score added each round, resulting score as derived state
-  - edit each round score
-*/
 type GameObject = {
-  state: string;
+  state: GameState;
   winner: string;
+  gameType: GameType
   scores: {
     [key: string]: number[];
   };
@@ -21,6 +18,7 @@ type GameObject = {
 const gameObject = {
 	state: "inProgress",
 	winner: "",
+  gameType: "greedy",
 	scores: {
     zac: [600, 1000, 2000],
   },
