@@ -41,13 +41,18 @@ let DetailIcon = ({className}: {className: string}) => (
     </svg>
 )
 
-const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPlayerScores, displayScores}: { game: GameObject;
-  handleSubmit: any;
-  handleChange: any;
+const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPlayerScores, displayScores, handleEditScore}: { game: GameObject;
+  handleSubmit:  (e: any) => void;
+  handleChange:  (e: any) => void;
   gameInput: any;
   currentPlayerScores: any;
   displayScores: any;
+  handleEditScore: ({score, indexToEdit, player}: 
+    {score: number; indexToEdit: number; player: string}) => void;
 }) => {
+  let [editScore, setEditScore] = useState<{score: number | ""; indexToEdit: number | null}>({score: "", indexToEdit: null})
+
+  
   return (
     <div>
       {Object.keys(game.scores).map((playerScore: any) => {
@@ -77,18 +82,61 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
                 />
               </form>
               </div>
-              <ul className="flex-col md:flex hidden">
+              <ul className="flex-col md:flex hidden mt-4">
                 {game.scores[playerScore].map((score: number, i: number) => {
                   let currentScore = displayScores[playerScore][i]
                   return (
                     <li className="text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}>
                       <div
-                        className={cx(" text-gray-500 font-bold text-xs self-center mr-8", {
-                          "hidden": score === 0,
+                        className={cx("h-8 text-gray-500 font-mono font-bold text-xs self-center px-2 py-1 rounded mr-8 cursor-pointer hover:bg-gray-200", {
+                          "hidden": score === 0 || editScore.indexToEdit === i,
                         })}
+                        onClick={() => setEditScore({score, indexToEdit: i})}
                       >+{score}</div>
+                      <div className="relative">
+                        <div className="absolute -left-[4.5rem] flex gap-1">
+                          <button type="submit"
+                            className={cx("h-8 w-8 text-center bg-green-200 text-black rounded border-2 border-gray-500 ", {
+                              "hidden": editScore.indexToEdit !== i,
+                            })}
+                            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                              e.preventDefault()
+                              handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                              setEditScore({score: "", indexToEdit: null})
+                            }}
+                            >&#10003;</button>
+                          <button type="submit"
+                            className={cx("h-8 w-8 text-center bg-red-200 text-black rounded border-2 border-gray-500", {
+                              "hidden": editScore.indexToEdit !== i,
+                            })}
+                            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                              e.preventDefault()
+                              setEditScore({score: "", indexToEdit: null})
+                            }}
+                            >x</button>
+                        </div>
+                        <input 
+                          type="number"
+                          className={cx(" w-24 h-8 text-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500", {
+                            "hidden": editScore.indexToEdit !== i,
+                          })}
+                          value={editScore.score as number}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditScore({score: parseInt(e.target.value), indexToEdit: i})}
+                          onSubmit={(e: React.FormEvent<HTMLInputElement>) => {
+                            e.preventDefault()
+                            handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                          }}
+                          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                            if (e.key === "Enter") {
+                              handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                              setEditScore({score: "", indexToEdit: null})
+                            }
+                          }}
+                        />
+                      </div>
+                      
                       <div
-                        className={cx(" w-16", {
+                        className={cx(" w-16 cursor-default", {
                           "hidden": currentScore === 0,
                         })
                         }
@@ -144,6 +192,17 @@ const Game = ({accessToken}: {accessToken: string}) => {
 				});
 
 				return { ...state, scores: newScores.pop() };
+      case "editScore":
+        let {score, indexToEdit, player} = newState
+        let playerScores = state.scores[player]
+        let editedScores = [
+          ...playerScores.slice(0, indexToEdit),
+          score,
+          ...playerScores.slice(indexToEdit + 1)
+        ]
+
+        return { ...state, scores: {...state.scores, [player]: editedScores}}
+
 			default:
 				return state;
 		}
@@ -208,9 +267,20 @@ const Game = ({accessToken}: {accessToken: string}) => {
 		});
 	};
 
-	const handleChange = (evt: any) => {
-		const id = evt.target.id;
-		const newValue = evt.target.value;
+  const handleEditScore = (
+    {score, indexToEdit, player}: 
+    {score: number; indexToEdit: number; player: string}) => {
+    setGame({
+      type: "editScore",
+      score,
+      indexToEdit,
+      player
+    })
+  }
+
+	const handleChange = (e: any) => {
+		const id = e.target.id;
+		const newValue = e.target.value;
 
 		if (newValue >= 0) setGameInput({ [id]: parseInt(newValue) });
 	};
@@ -296,6 +366,7 @@ const Game = ({accessToken}: {accessToken: string}) => {
           gameInput={gameInput}
           currentPlayerScores={currentPlayerScores}
           displayScores={displayScores}
+          handleEditScore={handleEditScore}
         />
       }
 			{/* <div>State: {JSON.stringify(gameInput)}</div>
