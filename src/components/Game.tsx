@@ -9,13 +9,22 @@ type GameState = "Set up" | "inProgress" | "last round" | "complete";
   - refactor to store score added each round, resulting score as derived state
   - edit each round score
 */
+type GameObject = {
+  state: string;
+  winner: string;
+  scores: {
+    [key: string]: number[];
+  };
+  // players: string[];
+};
 
 const gameObject = {
-	state: "Set up",
+	state: "inProgress",
 	winner: "",
 	scores: {
-    
+    zac: [600, 1000, 2000],
   },
+  players: []
 };
 
 let initialInputState = Object.keys(gameObject.scores).reduce(
@@ -32,7 +41,74 @@ let DetailIcon = ({className}: {className: string}) => (
     </svg>
 )
 
-const Game = () => {
+const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPlayerScores, displayScores}: { game: GameObject;
+  handleSubmit: any;
+  handleChange: any;
+  gameInput: any;
+  currentPlayerScores: any;
+  displayScores: any;
+}) => {
+  return (
+    <div>
+      {Object.keys(game.scores).map((playerScore: any) => {
+        return (
+          <div className="h-full w-full max-w-sm" key={playerScore}>
+            <div className="mb-2 sm:mb-8 w-full">
+              <div className="gap-2 border-b-2 w-full">
+              <div className="flex justify-between">
+                <div className="flex gap-2">
+                  <h2 className="text-3xl sm:text-xl text-center">{playerScore}</h2>
+                    <div className="relative self-center group cursor-pointer sm:cursor-default ">
+                      <DetailIcon className=" sm:hidden h-5 w-5"/>
+                      <div className=" left-12 opacity-0 group-hover:opacity-100 select-none sm:group-hover:opacity-0 duration-300 absolute inset-0 z-10 flex justify-center items-center text-xs text-black font-semibold bg-opacity-50 rounded bg-white">score details</div>
+                    </div>
+                </div>
+                <p className="text-3xl sm:text-lg text-center md:hidden">{currentPlayerScores[playerScore]}</p>
+              </div>
+              <form onSubmit={handleSubmit} id={`${playerScore}-form`} className="mt-4 w-full">
+                <input
+                  className="w-full py-2 bg-gray-50 text-black rounded px-4 "
+                  placeholder={`enter score...`}
+                  id={playerScore}
+                  onChange={handleChange}
+                  value={gameInput[playerScore] || ""}
+                  type="number"
+                  step={50}
+                />
+              </form>
+              </div>
+              <ul className="flex-col md:flex hidden">
+                {game.scores[playerScore].map((score: number, i: number) => {
+                  let currentScore = displayScores[playerScore][i]
+                  return (
+                    <li className="text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}>
+                      <div
+                        className={cx(" text-gray-500 font-bold text-xs self-center mr-8", {
+                          "hidden": score === 0,
+                        })}
+                      >+{score}</div>
+                      <div
+                        className={cx(" w-16", {
+                          "hidden": currentScore === 0,
+                        })
+                        }
+                      >
+                        <div className="w-fit float-right">
+                          {currentScore}
+                        </div>
+                      </div>
+                    </li>);
+                })}
+              </ul>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )
+}
+
+const Game = ({accessToken}: {accessToken: string}) => {
 	const [game, setGame] = useReducer((state: any, newState: any) => {
 		switch (newState.type) {
 			case "startGame":
@@ -136,7 +212,7 @@ const Game = () => {
 		const id = evt.target.id;
 		const newValue = evt.target.value;
 
-		if (newValue > 0) setGameInput({ [id]: parseInt(newValue) });
+		if (newValue >= 0) setGameInput({ [id]: parseInt(newValue) });
 	};
 
 	const [setUpFormValues, setSetUpFormValues] = useState([{ name: "" }]);
@@ -213,60 +289,15 @@ const Game = () => {
 				</div>
 			)}
 			{game.state === "inProgress" &&
-				Object.keys(game.scores).map((playerScore: any) => {
-					return (
-						<div className="h-full w-full max-w-sm" key={playerScore}>
-							<div className="mb-2 sm:mb-8 w-full">
-                <div className="gap-2 border-b-2 w-full">
-                <div className="flex justify-between">
-                  <div className="flex gap-2">
-                    <h2 className="text-3xl sm:text-xl text-center">{playerScore}</h2>
-                      <div className="relative self-center group cursor-pointer sm:cursor-default ">
-                        <DetailIcon className=" sm:hidden h-5 w-5"/>
-                        <div className=" left-12 opacity-0 group-hover:opacity-100 select-none sm:group-hover:opacity-0 duration-300 absolute inset-0 z-10 flex justify-center items-center text-xs text-black font-semibold bg-opacity-50 rounded bg-white">score details</div>
-                      </div>
-                  </div>
-                  <p className="text-3xl sm:text-lg text-center md:hidden">{currentPlayerScores[playerScore]}</p>
-                </div>
-								<form onSubmit={handleSubmit} id={`${playerScore}-form`} className="mt-4 w-full">
-									<input
-										className="w-full py-2 bg-gray-50 text-black rounded px-4 "
-										placeholder={`enter score...`}
-										id={playerScore}
-										onChange={handleChange}
-										value={gameInput[playerScore] || ""}
-										type="number"
-                    step={50}
-									/>
-								</form>
-                </div>
-								<ul className="flex-col md:flex hidden">
-									{game.scores[playerScore].map((score: number, i: number) => {
-                    let currentScore = displayScores[playerScore][i]
-										return (
-                      <li className="text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}>
-                        <div
-                          className={cx(" text-gray-500 font-bold text-xs self-center mr-8", {
-                            "hidden": score === 0,
-                          })}
-                        >+{score}</div>
-                        <div
-                          className={cx(" w-16", {
-                            "hidden": currentScore === 0,
-                          })
-                          }
-                        >
-                          <div className="w-fit float-right">
-                            {currentScore}
-                          </div>
-                        </div>
-                      </li>);
-									})}
-								</ul>
-							</div>
-						</div>
-					);
-				})}
+        <GameInProgress
+          game={game}
+          handleSubmit={handleSubmit}
+          handleChange={handleChange}
+          gameInput={gameInput}
+          currentPlayerScores={currentPlayerScores}
+          displayScores={displayScores}
+        />
+      }
 			{/* <div>State: {JSON.stringify(gameInput)}</div>
       <div>State: {JSON.stringify(game)}</div> */}
 		</div>
