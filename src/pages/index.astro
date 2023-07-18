@@ -4,6 +4,8 @@ import Game from "@components/Game";
 import { getUser } from "@lib/auth";
 import { supabase } from "@lib/supabase";
 
+
+
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
@@ -29,7 +31,11 @@ if (Astro.request.method === "POST") {
   }
 }
 
-let user = await getUser(Astro.request)
+let session = await getUser(Astro.request)
+let user = session?.user
+let accessToken = session?.accessToken
+
+console.log({user, accessToken})
 
 ---
 
@@ -38,7 +44,7 @@ let user = await getUser(Astro.request)
   <main class="max-w-4xl mx-auto">
     {
       user !== null ? (
-        <Game client:only="react" />
+        <Game client:only="react" accessToken={accessToken || ""} />
         
       ) : (
         <div class="w-fit mx-auto border-2 border-gray-500 rounded p-4">
@@ -78,6 +84,4 @@ let user = await getUser(Astro.request)
   })
 
   }
-
-
 </script>
