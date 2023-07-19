@@ -20,7 +20,8 @@ const gameObject = {
 	winner: "",
   gameType: "greedy",
 	scores: {
-    zac: [600, 1000, 2000],
+    zac: [600],
+    mariah: [600],
   },
   players: []
 };
@@ -48,16 +49,21 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
   handleEditScore: ({score, indexToEdit, player}: 
     {score: number; indexToEdit: number; player: string}) => void;
 }) => {
-  let [editScore, setEditScore] = useState<{score: number | ""; indexToEdit: number | null}>({score: "", indexToEdit: null})
+  let [editScore, setEditScore] = useState<{score: number | ""; indexToEdit: number | null; player: string;}>({score: "", indexToEdit: null, player: ""})
+  let [playerColumn, setPlayerColumn] = useState<string>("")
+
 
   
   return (
-    <div>
+    <div className="h-full w-full max-w-sm flex gap-2">
+      {/* <div>State: {JSON.stringify(editScore)}</div>
+      <div>State: {JSON.stringify(playerColumn)}</div> */}
       {Object.keys(game.scores).map((playerScore: any) => {
         return (
-          <div className="h-full w-full max-w-sm" key={playerScore}>
+          <div className="" key={playerScore}>
+            
             <div className="mb-2 sm:mb-8 w-full">
-              <div className="gap-2 border-b-2 w-full">
+              <div className=" border-b-2 w-full">
               <div className="flex justify-between">
                 <div className="flex gap-2">
                   <h2 className="text-3xl sm:text-xl text-center">{playerScore}</h2>
@@ -84,15 +90,26 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
                 {game.scores[playerScore].map((score: number, i: number) => {
                   let currentScore = displayScores[playerScore][i]
                   return (
-                    <li className="text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}>
+                    <li className="relative text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}
+                      onClick={() => {
+                        
+                        setPlayerColumn(`${playerScore}-${score}-${i}`)
+                      }}
+                    >
                       <div
+                        key={`${playerScore}-${score}-${i}-edit`}
                         className={cx("h-8 text-gray-500 font-mono font-bold text-xs self-center px-2 py-1 rounded mr-8 cursor-pointer hover:bg-gray-200", {
-                          "hidden": score === 0 || editScore.indexToEdit === i,
+                          "hidden": score === 0,
                         })}
-                        onClick={() => setEditScore({score, indexToEdit: i})}
+                        onClick={(e) => {
+                          console.log(e.currentTarget.getAttribute('id'));
+                          setEditScore({score, indexToEdit: i, player: playerScore})
+                        }}
                       >+{score}</div>
-                      <div className="relative">
-                        <div className="absolute -left-[4.5rem] flex gap-1">
+                      <div className={cx("absolute -left-[5.5rem] flex flex-row gap-2", {
+                            "hidden": playerColumn !== `${playerScore}-${score}-${i}`,
+                          })}>
+                        <div className=" flex gap-1">
                           <button type="submit"
                             className={cx("h-8 w-8 text-center bg-green-200 text-black rounded border-2 border-gray-500 ", {
                               "hidden": editScore.indexToEdit !== i,
@@ -100,7 +117,7 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
                             onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                               e.preventDefault()
                               handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
-                              setEditScore({score: "", indexToEdit: null})
+                              setEditScore({score: "", indexToEdit: null, player: playerScore})
                             }}
                             >&#10003;</button>
                           <button type="submit"
@@ -109,7 +126,8 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
                             })}
                             onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                               e.preventDefault()
-                              setEditScore({score: "", indexToEdit: null})
+                              setEditScore({score: "", indexToEdit: null, player: ""})
+                              setPlayerColumn("")
                             }}
                             >x</button>
                         </div>
@@ -117,17 +135,17 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
                           type="number"
                           className={cx(" w-24 h-8 text-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500", {
                             "hidden": editScore.indexToEdit !== i,
-                          })}
+                          }) }
                           value={editScore.score as number}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditScore({score: parseInt(e.target.value), indexToEdit: i})}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditScore({score: parseInt(e.target.value), indexToEdit: i, player: playerScore})}
                           onSubmit={(e: React.FormEvent<HTMLInputElement>) => {
                             e.preventDefault()
-                            handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                            handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: ""})
                           }}
                           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                             if (e.key === "Enter") {
                               handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
-                              setEditScore({score: "", indexToEdit: null})
+                              setEditScore({score: "", indexToEdit: null, player: ""})
                             }
                           }}
                         />
