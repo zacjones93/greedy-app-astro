@@ -2,7 +2,10 @@ import { useState, useReducer, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { twMerge } from "tailwind-merge";
 import cx from "classnames";
-type GameState = "Set up" | "inProgress" | "last round" | "complete";
+import CreateGame from "./create-game";
+
+
+type GameState = "setUp" | "inProgress" | "complete";
 type GameType = "greedy" | "farkle" | "10 crowns";
 
 type GameObject = {
@@ -16,7 +19,7 @@ type GameObject = {
 };
 
 const gameObject = {
-	state: "inProgress",
+	state: "Set up",
 	winner: "",
   gameType: "greedy",
 	scores: {
@@ -172,7 +175,9 @@ const GameInProgress = ({game, handleSubmit, handleChange, gameInput, currentPla
   )
 }
 
+
 const Game = ({accessToken}: {accessToken: string}) => {
+  console.log("accessToken", accessToken)
 	const [game, setGame] = useReducer((state: any, newState: any) => {
 		switch (newState.type) {
 			case "startGame":
@@ -301,78 +306,16 @@ const Game = ({accessToken}: {accessToken: string}) => {
 		if (newValue >= 0) setGameInput({ [id]: parseInt(newValue) });
 	};
 
-	const [setUpFormValues, setSetUpFormValues] = useState([{ name: "" }]);
+	
 
-	const handleCreationSubmit = (e: any) => {
-		e.preventDefault();
 
-		setGame({ type: "startGame", setUpFormValues });
-	};
 
-	let handleSetUpChange = (i: any, e: any) => {
-		let newFormValues: any = [...setUpFormValues];
-		newFormValues[i][e.target.name] = e.target.value
-		setSetUpFormValues(newFormValues);
-	};
-
-	let addSetUpFormFields = () => {
-		setSetUpFormValues([...setUpFormValues, { name: "" }]);
-	};
-
-	let removeSetUpFormFields = (i: any) => {
-		let newFormValues = [...setUpFormValues];
-		newFormValues.splice(i, 1);
-		setSetUpFormValues(newFormValues);
-	};
 
 	return (
 		<div className="flex flex-wrap sm:flex-nowrap self-center justify-between h-full w-full gap-4 text-black">
       <Toaster />
 			{game.state === "Set up" && (
-				<div className="flex flex-col justify-between w-full h-full gap-4 mx-auto">
-					<h2 className="text-2xl text-center">Add how many players you'd like to keep track of 👇</h2>
-					<form onSubmit={handleCreationSubmit} className="flex flex-wrap sm:flex-wrap-0 justify-evenly" id="setup-form">
-						<div className="mb-4 flex flex-col gap-4">
-							<button
-								className="px-20 py-4 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
-								type="button"
-								onClick={() => addSetUpFormFields()}
-							>
-								Add
-							</button>
-							<button
-								className="bg-blue-500 px-20 py-4  rounded text-white ml-0 hover:opacity-80"
-								type="submit"
-							>
-								Submit
-							</button>
-						</div>
-            <div className="flex flex-col">
-						{setUpFormValues.map((element, index) => (
-							<div className="flex flex-col sm:flex-row gap-2 mt-2 relative " key={index}>
-								<label className="self-center shrink-0">Player {index + 1}</label>
-								<input
-									type="text"
-									name="name"
-                  className="w-full h-fit self-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500"
-									value={element.name || ""}
-									onChange={(e) => handleSetUpChange(index, e)}
-								/>
-
-								{index ? (
-									<button
-										type="button"
-										className="absolute -right-[6.5rem] top-8 sm:top-0  py-2 px-4 border-2 rounded border-gray-500 hover:text-red-500 hover:border-red-500"
-										onClick={() => removeSetUpFormFields(index)}
-									>
-										Remove
-									</button>
-								) : null}
-							</div>
-						))}
-            </div>
-					</form>
-				</div>
+				<CreateGame setGame={setGame} />
 			)}
 			{game.state === "inProgress" &&
         <GameInProgress

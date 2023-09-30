@@ -1,6 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Game from "@components/Game";
+import Game from "@components/game/Game";
 import { getUser } from "@lib/auth";
 import { supabase } from "@lib/supabase";
 
@@ -35,7 +35,6 @@ let session = await getUser(Astro.request)
 let user = session?.user
 let accessToken = session?.accessToken
 
-console.log({user, accessToken})
 
 ---
 
