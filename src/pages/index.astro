@@ -1,6 +1,8 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Game from "@components/game/Game";
+import { Toaster } from "react-hot-toast";
+
+import Game from "@components/game/game";
 import { getUser } from "@lib/auth";
 import { supabase } from "@lib/supabase";
 
@@ -39,12 +41,11 @@ let accessToken = session?.accessToken
 ---
 
 <Layout title="Welcome to Astro.">
-
   <main class="max-w-4xl mx-auto">
+    <Toaster client:load />
     {
       user !== null ? (
-        <Game client:only="react" accessToken={accessToken || ""} />
-        
+        <Game client:load accessToken={accessToken || ""} />
       ) : (
         <div class="w-fit mx-auto border-2 border-gray-500 rounded p-4">
           <h1 class=" text-2xl">Sign up for the Greedy App.</h1>

@@ -1,12 +1,13 @@
+import { createGame } from "@lib/gameStore";
 import { useState } from "react";
+import { v4 } from "uuid";
 
-const CreateGame = ({setGame}: {setGame: (params: any) => void}) => {
+const CreateGame = () => {
   const [setUpFormValues, setSetUpFormValues] = useState([{ name: "" }]);
-  
+
   const handleCreationSubmit = (e: any) => {
     e.preventDefault();
-
-    setGame({ type: "startGame", setUpFormValues });
+    createGame(setUpFormValues)
   };
 
   let handleSetUpChange = (i: any, e: any) => {
@@ -25,7 +26,8 @@ const CreateGame = ({setGame}: {setGame: (params: any) => void}) => {
     setSetUpFormValues(newFormValues);
   };
 
-return (<div className="flex flex-col justify-between w-full h-full gap-4 mx-auto">
+return (
+<div className="flex flex-col justify-between w-full h-full gap-4 mx-auto">
 <h2 className="text-2xl text-center">Add how many players you'd like to keep track of 👇</h2>
 <form onSubmit={handleCreationSubmit} className="flex flex-wrap sm:flex-wrap-0 justify-evenly" id="setup-form">
   <div className="mb-4 flex flex-col gap-4">
@@ -43,9 +45,9 @@ return (<div className="flex flex-col justify-between w-full h-full gap-4 mx-aut
       Submit
     </button>
   </div>
-  <div className="flex flex-col">
+  <div id="dynamic-fields" className="flex flex-col">
   {setUpFormValues.map((element, index) => (
-    <div className="flex flex-col sm:flex-row gap-2 mt-2 relative " key={index}>
+    <div  className="flex flex-col sm:flex-row gap-2 mt-2 relative " key={index}>
       <label className="self-center shrink-0">Player {index + 1}</label>
       <input
         type="text"
@@ -53,6 +55,11 @@ return (<div className="flex flex-col justify-between w-full h-full gap-4 mx-aut
         className="w-full h-fit self-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500"
         value={element.name || ""}
         onChange={(e) => handleSetUpChange(index, e)}
+        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+          if (e.key === "Tab" && index === setUpFormValues.length - 1) {
+            addSetUpFormFields()
+          }
+        }}
       />
 
       {index ? (

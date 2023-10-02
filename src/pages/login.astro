@@ -5,6 +5,12 @@ import { supabase } from "@lib/supabase";
 
 let logInError = null
 
+const sessionCookie = Astro.cookies.get("session")
+
+if(sessionCookie) {
+  return Astro.redirect("/")
+}
+
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
