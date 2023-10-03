@@ -1,14 +1,14 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import { signInWithEmail } from '@lib/auth'
-import { supabase } from "@lib/supabase";
+import { getUser } from "@lib/auth";
+
+const user = await getUser(Astro.request)
 
 let logInError = null
 
-const sessionCookie = Astro.cookies.get("session")
-
-if(sessionCookie) {
-  return Astro.redirect("/")
+if (user?.user?.role === 'authenticated') {
+  Astro.redirect("/")
 }
 
 if (Astro.request.method === "POST") {

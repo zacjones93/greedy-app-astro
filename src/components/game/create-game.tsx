@@ -1,13 +1,12 @@
 import { createGame } from "@lib/gameStore";
 import { useState } from "react";
-import { v4 } from "uuid";
 
-const CreateGame = () => {
+const CreateGame = ({accessToken}: {accessToken: string}) => {
   const [setUpFormValues, setSetUpFormValues] = useState([{ name: "" }]);
 
   const handleCreationSubmit = (e: any) => {
     e.preventDefault();
-    createGame(setUpFormValues)
+    createGame(setUpFormValues, accessToken)
   };
 
   let handleSetUpChange = (i: any, e: any) => {

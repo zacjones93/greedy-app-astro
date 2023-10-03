@@ -1,0 +1,15 @@
+---
+import {getGameById} from '@lib/database'
+import Layout from "@layouts/Layout.astro";
+import GameInProgress from '@components/game/game-in-progress'
+
+const { slug } = Astro.params
+const {data, error} = await getGameById(slug)
+const game = data[0]
+---
+
+<Layout title='Current Game'>
+  <div class="max-w-3xl mx-auto">
+    <GameInProgress client:only="react" slug={slug} currentGame={game} />
+  </div>
+</Layout>

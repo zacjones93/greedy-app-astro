@@ -1,15 +1,22 @@
 import { useState, useReducer, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import cx from "classnames";
-
 import { useStore } from "@nanostores/react";
-import { addScore, editScore as editStoreScore, game as gameStore } from "@lib/gameStore";
+import { GameObject, addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
+import { saveGameById } from "@lib/database";
 
-const GameInProgress = () => {
+const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: string}) => {
   const $gameRecord = useStore(gameStore)
-  const gameId = Object.keys($gameRecord).slice(-1)[0]
+  const gameId = Object.keys($gameRecord)?.slice(-1)[0]
   const game = $gameRecord[gameId]
 
+  useEffect(() => {
+    if (slug && currentGame) {
+      resumeGame(slug, currentGame)
+    }
+  }, [])
+
+  
   let [editScore, setEditScore] = useState<{score: number | ""; indexToEdit: number | null; player: string;}>({score: "", indexToEdit: null, player: ""})
   let [playerColumn, setPlayerColumn] = useState<string>("")
 
@@ -19,7 +26,14 @@ const GameInProgress = () => {
 	);
 
 	const gameScores = game?.scores;
-  const displayScores = Object.keys(gameScores).reduce((prevPlayers: any, currPlayer: any) => {
+  
+  useEffect(() => {
+    (async () => {
+      await saveGameById(gameId, gameScores)
+    })()
+  }, [gameScores])
+
+  const displayScores = gameScores ? Object.keys(gameScores).reduce((prevPlayers: any, currPlayer: any) => {
     let tempAggregator = 0
     let newScores = gameScores[currPlayer].map((score: number, i: number, array: number[]) => {
       if(i === 0) return score
@@ -33,14 +47,13 @@ const GameInProgress = () => {
       ...prevPlayers,
       [currPlayer]: newScores 
     }
-  }, {})
+  }, {}) : []
   const currentPlayerScores: any = Object.keys(displayScores).reduce((prev, curr) => {
     return {
       ...prev,
       [curr]: displayScores[curr].slice(-1).pop()
     }
   }, {})
-	const players = Object.keys(game.scores);
 	// useEffect(() => {
 	//   console.log("game scores", gameScores)
 	//   players.map((player: any) => {
@@ -80,12 +93,14 @@ const GameInProgress = () => {
 
 		if (newValue >= 0) setGameInput({ [id]: parseInt(newValue) });
 	};
-  
-  return (
+
+  const scoresMap = game?.scores ? Object.keys(game?.scores) : []
+
+  return (game ? (
     <div className="h-full w-full max-w-sm flex gap-2">
       {/* <div>State: {JSON.stringify(editScore)}</div>
       <div>State: {JSON.stringify(playerColumn)}</div> */}
-      {Object.keys(game.scores).map((playerScore: any) => {
+      {scoresMap.map((playerScore: any) => {
         return (
           <div className="" key={playerScore}>
             
@@ -196,8 +211,8 @@ const GameInProgress = () => {
           </div>
         );
       })}
-    </div>
-  )
+    </div>)
+  : null) 
 }
 
 const DetailIcon = ({className}: {className: string}) => (

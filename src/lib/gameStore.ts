@@ -1,10 +1,11 @@
 import { atom, map } from 'nanostores';
 import { toast } from 'react-hot-toast';
 import {v4}  from 'uuid';
+import { createGameinDatabase } from './database';
 
 export type GameState = "setUp" | "inProgress" | "complete";
 export type GameType = "greedy" | "farkle" | "10 crowns";
-export type GameObject = { state: GameState; scores: any; winner: string; gameType: string; players: string[] | never[]; }
+export type GameObject = { id: string, state: GameState; scores: any; winner: string; gameType: string; players: string[] | never[]; }
 
 const gameObject = {
 	state: "setUp",
@@ -50,7 +51,16 @@ export const game = map<Record<string, GameObject>>({});
 }
 */
 
-export const createGame = (setUpFormValues: any) => {
+export const resumeGame = (gameId: string, newGame: GameObject) => {
+
+  game.setKey(gameId, {
+    ...newGame
+  })
+
+  let currentGame = game.get()[gameId];
+}
+
+export const createGame = (setUpFormValues: any, accessToken: string) => {
   let scores = setUpFormValues
     .filter((player: any) => !!player?.name)
     .reduce((acc: any, player: any) => {
@@ -63,8 +73,11 @@ export const createGame = (setUpFormValues: any) => {
     game.setKey(id, {
       ...gameObject,
 			state: "inProgress",
-			scores
+			scores,
+      id
 		});
+
+    createGameinDatabase({id, gameType: gameObject.gameType, scores, accessToken})
 }
 
 export const addScore = (gameId: string, scores: {[key: string]: number[]}) => {

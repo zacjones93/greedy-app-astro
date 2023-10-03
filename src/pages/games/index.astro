@@ -1,0 +1,39 @@
+---
+import Layout from "@layouts/Layout.astro";
+import {getAllGamesByUser} from "@lib/database";
+import {getUser} from "@lib/auth";
+
+const user = await getUser(Astro.request);
+console.log({id: user.user.id})
+const {data, error} = await getAllGamesByUser(user.user.id);
+console.log({data, error})
+---
+<Layout>
+  <main class=" max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold">Your Games In Progress</h1>
+    <div class="flex gap-4 mt-4">
+      {data.map((game) => {
+        return (
+          <a 
+            class="border border-gray-50 w-fit p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer"
+            href={`/games/${game.id}`}
+          >
+            <h2 class=" text-xl">{game.type}</h2>
+            <p class="text-md text-gray-300">{new Date(game.created_at).toLocaleDateString()}</p>
+
+            <h3>Player Scores</h3>
+            <ul class="flex gap-2">
+              
+              {Object.keys(game.scores).map((player) => {
+              return (
+                <li>
+                  <h2>{player}</h2>
+                  <p>{game.scores[player]}</p>
+                </li>
+              )})}
+            </ul>
+          </a>
+        )})}
+      </div>
+    </main>
+</Layout>

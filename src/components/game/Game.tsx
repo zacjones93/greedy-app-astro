@@ -13,7 +13,7 @@ const Game = ({accessToken}: {accessToken: string}) => {
 	return (
 		<div className="flex flex-wrap sm:flex-nowrap self-center justify-between h-full w-full gap-4 text-black">
 			{!game && (
-				<CreateGame />
+				<CreateGame accessToken={accessToken} />
 			)}
 			{game?.state === "inProgress" &&
         <GameInProgress />

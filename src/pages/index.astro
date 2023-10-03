@@ -37,6 +37,10 @@ let session = await getUser(Astro.request)
 let user = session?.user
 let accessToken = session?.accessToken
 
+if (!session) {
+  return Astro.redirect("/login")
+}
+
 
 ---
 
