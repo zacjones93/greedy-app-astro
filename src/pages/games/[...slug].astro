@@ -4,8 +4,8 @@ import Layout from "@layouts/Layout.astro";
 import GameInProgress from '@components/game/game-in-progress'
 
 const { slug } = Astro.params
-const {data, error} = await getGameById(slug)
-const game = data[0]
+const {data, error} = slug ? await getGameById(slug) : {data: null, error: null}
+const game = data ? data[0] : null
 ---
 
 <Layout title='Current Game'>

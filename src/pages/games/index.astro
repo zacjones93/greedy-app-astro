@@ -2,17 +2,18 @@
 import Layout from "@layouts/Layout.astro";
 import {getAllGamesByUser} from "@lib/database";
 import {getUser} from "@lib/auth";
+import type { Image } from "astro:assets";
 
 const user = await getUser(Astro.request);
-console.log({id: user.user.id})
-const {data, error} = await getAllGamesByUser(user.user.id);
-console.log({data, error})
+const userId = user?.user?.id
+const {data, error} = userId ? await getAllGamesByUser(userId) : {data: [], error: null}
+
 ---
-<Layout>
+<Layout title="games">
   <main class=" max-w-3xl mx-auto">
     <h1 class="text-3xl font-bold">Your Games In Progress</h1>
     <div class="flex gap-4 mt-4">
-      {data.map((game) => {
+      {data ? data.map((game) => {
         return (
           <a 
             class="border border-gray-50 w-fit p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer"
@@ -33,7 +34,7 @@ console.log({data, error})
               )})}
             </ul>
           </a>
-        )})}
+        )}) : <p>You don't have any games yet...</p>}
       </div>
     </main>
 </Layout>
