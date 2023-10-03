@@ -7,13 +7,15 @@ import type { Image } from "astro:assets";
 const user = await getUser(Astro.request);
 const userId = user?.user?.id
 const {data, error} = userId ? await getAllGamesByUser(userId) : {data: [], error: null}
+const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
 ---
 <Layout title="games">
   <main class=" max-w-3xl mx-auto">
     <h1 class="text-3xl font-bold">Your Games In Progress</h1>
     <div class="flex gap-4 mt-4">
-      {data ? data.map((game) => {
+      {data && sortedData ? sortedData.map((game) => {
+        
         return (
           <a 
             class="border border-gray-50 w-fit p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer"
@@ -26,11 +28,13 @@ const {data, error} = userId ? await getAllGamesByUser(userId) : {data: [], erro
             <ul class="flex gap-2">
               
               {Object.keys(game.scores).map((player) => {
-              return (
-                <li>
-                  <h2>{player}</h2>
-                  <p>{game.scores[player]}</p>
-                </li>
+                return (
+                  <li>
+                    <h2>{player}</h2>
+                    <div class="flex flex-col">{game.scores[player].map((score: number[]) => {
+                      return <div>{score}</div>
+                    })}</div>
+                  </li>
               )})}
             </ul>
           </a>
