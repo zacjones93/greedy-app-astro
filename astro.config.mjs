@@ -11,5 +11,13 @@ export default defineConfig({
   experimental: {
     assets: true
   },
-  adapter: vercel()
+  adapter: vercel(),
+  vite: {
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+        "@tests": path.resolve(__dirname, "./tests")
+      }
+    }
+  }
 });
