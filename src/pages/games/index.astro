@@ -6,6 +6,11 @@ import type { Image } from "astro:assets";
 
 const user = await getUser(Astro.request);
 const userId = user?.user?.id
+
+if (!userId) {
+  return Astro.redirect("/login");
+}
+
 const {data, error} = userId ? await getAllGamesByUser(userId) : {data: [], error: null}
 const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 

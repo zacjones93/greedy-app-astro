@@ -2,6 +2,15 @@
 import {getGameById} from '@lib/database'
 import Layout from "@layouts/Layout.astro";
 import GameInProgress from '@components/game/game-in-progress'
+import { Toaster } from 'react-hot-toast';
+import { getUser } from '@lib/auth';
+
+const user = await getUser(Astro.request);
+const userId = user?.user?.id
+
+if (!userId) {
+  return Astro.redirect("/login");
+}
 
 const { slug } = Astro.params
 const {data, error} = slug ? await getGameById(slug) : {data: null, error: null}
@@ -9,6 +18,7 @@ const game = data ? data[0] : null
 ---
 
 <Layout title='Current Game'>
+  <Toaster />
   <div class="max-w-3xl mx-auto">
     <GameInProgress client:only="react" slug={slug} currentGame={game} />
   </div>
