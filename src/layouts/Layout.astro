@@ -3,9 +3,11 @@ export interface Props {
 	title: string;
 }
 import { supabase } from '../lib/supabase';
+import { Image } from 'astro:assets';
 
 
 const { title } = Astro.props;
+
 
 const sessionCookie = Astro.cookies.get("session")
 const parsedSession = JSON.parse(sessionCookie.value || "{}")
@@ -21,31 +23,48 @@ const user = session.data.user
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description">
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo/favicon-16x16.png">
+    <link rel="manifest" href="/logo/site.webmanifest">
+    <link rel="mask-icon" href="/logo/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
 		<meta name="generator" content={Astro.generator} />
+    <meta property="og:title" content="greedy app" />
+    <meta property="og:description" content="Keep Score with out the headache" />
+    <meta property="og:image" content="/og-images/og-image-greedy-app.png" />
 		<title>{title}</title>
 	</head>
-  <nav class="flex justify-end m-4">
+  <nav class="flex justify-between m-4 max-w-4xl mb-10 mx-auto px-4">
+    <div>
+        <a
+          class="flex whitespace-nowrap items-center gap-2 w-[35px] h-[35px]]"
+          href="/"
+        >
+          <Image 
+            class="self-center"
+            src="/logo/greedy-app-logo.png"
+            alt="logo"
+            width="50"
+            height="50"
+          />
+          <p class=" font-mono">greedy app</p> 
+      </a>
+    </div>
     {
       user ? (
         <div class="flex gap-4">
-        <a 
-          class="self-center underline underline-offset-2 hover:text-blue-500 cursor-pointer"
-          href="/games"
-        >
-          Your Games
-        </a>
-        <p class="self-center cursor-default select-none">{user.email}</p>
-        <a
-          class="signout self-end px-4 py-2  hover:text-blue-500"
-          href="/logout"
-        >
-          log out
-        </a>
+          <a 
+            class="self-center underline underline-offset-2 hover:text-gray-700 cursor-pointer font-mono"
+            href="/games"
+          >
+            Your Games
+          </a>
       </div>
       ) : (
         <a
-          class="px-4 py-2 border-2 rounded border-gray-500 hover:text-blue-500 hover:border-blue-500"
+          class="px-4 py-2 border-2 rounded-sm border-gray-500 hover:text-gray-700 hover:border-gray-700"
           href="/login"
         >
           log in
@@ -54,8 +73,32 @@ const user = session.data.user
     }
   </nav>
 	<body>
-		<slot />
+		<slot/>
+
+    <footer class=" bg-gray-200 min-h-[100px] flex-shrink-0">
+      {
+        user ? (
+          <div class="flex flex-col items-end gap-2 p-4">
+            <p class="cursor-default select-none w-fit font-mono">{user.email}</p>
+            <a
+              class="signout whitespace-nowrap hover:text-gray-700"
+              href="/logout"
+            >
+              log out
+            </a>
+          </div>
+        ) : (
+          <a
+            class="float-right pt-8 px-4 py-2 rounded-sm hover:text-gray-700 font-mono"
+            href="/login"
+          >
+            log in
+          </a>
+        )
+      }
+    </footer>
 	</body>
+  
 </html>
 
 <style is:global>
@@ -67,6 +110,9 @@ const user = session.data.user
 		font-family: system-ui, sans-serif;
 		background-color: #F6F6F6;
 	}
+  * {
+    margin: 0;
+  }
 	code {
 		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
 			Bitstream Vera Sans Mono, Courier New, monospace;

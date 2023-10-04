@@ -100,16 +100,15 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
   console.log({game})
 
   return (game ? (
-    <div className="h-full w-full max-w-3xl">
+    <div className="h-full w-full min-h-screen font-mono  max-w-3xl p-4">
       <Toaster />
       {/* <div>State: {JSON.stringify(editScore)}</div>
       <div>State: {JSON.stringify(playerColumn)}</div> */}
       <h1 className=" text-3xl my-4 ">{game.type}</h1>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-4">
         {scoresMap.map((playerScore: any) => {
           return (
             <div className="" key={playerScore}>
-              
               <div className="mb-2 sm:mb-8 w-full">
                 <div className=" border-b-2 w-full">
                 <div className="flex justify-between">

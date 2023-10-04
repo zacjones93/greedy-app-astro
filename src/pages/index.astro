@@ -4,34 +4,8 @@ import { Toaster } from "react-hot-toast";
 
 import Game from "@components/game/game";
 import { getUser } from "@lib/auth";
-import { supabase } from "@lib/supabase";
 
 
-
-if (Astro.request.method === "POST") {
-  try {
-    const data = await Astro.request.formData();
-    const email = data.get("email") as string;
-    const password = data.get("password") as string
-    // Do something with the data
-
-    const {data: userData, error} = await supabase.auth.signUp({
-    email,
-    password}
-    )
-
-    if (error) {
-      throw error
-    }
-    if (userData?.user) Astro.cookies.set("user", userData.user)
-    return Astro.redirect("/check-your-email")
-
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-  }
-}
 
 let session = await getUser(Astro.request)
 let user = session?.user
@@ -64,9 +38,9 @@ if (!session) {
               <label for="password">Password</label>
               <input id="password" type="password" name="password" class="bg-gray-50 rounded p-2" />
             </div>
-            <button type="submit" class=" px-4 py-2 mt-4 bg-blue-500 rounded hover:opacity-80 text-white ">Sign up</button>
+            <button type="submit" class=" px-4 py-2 mt-4 bg-black rounded hover:opacity-80 text-white ">Sign up</button>
           </form>
-          <span class="">already signed up? <a href="/login" class="text-blue-500 underline">Log in</a></span>
+          <span class="">already signed up? <a href="/login" class="text-black underline">Log in</a></span>
         </div>
       )
     }
