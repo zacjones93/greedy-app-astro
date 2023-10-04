@@ -15,6 +15,11 @@ if (!userId) {
 const { slug } = Astro.params
 const {data, error} = slug ? await getGameById(slug) : {data: null, error: null}
 const game = data ? data[0] : null
+
+if (!game) {
+  return Astro.redirect("/games");
+}
+
 ---
 
 <Layout title='Current Game'>

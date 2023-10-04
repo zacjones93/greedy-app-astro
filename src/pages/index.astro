@@ -39,6 +39,8 @@ let accessToken = session?.accessToken
 
 if (!session) {
   return Astro.redirect("/login")
+} else {
+  return Astro.redirect("/games")
 }
 
 
@@ -46,7 +48,6 @@ if (!session) {
 
 <Layout title="Welcome to Astro.">
   <main class="max-w-4xl mx-auto">
-    <Toaster client:load />
     {
       user !== null ? (
         <Game client:load accessToken={accessToken || ""} />
@@ -85,7 +86,6 @@ if (!session) {
           expires_in: hashParameters.get('expires_in'),
           refresh_token: hashParameters.get('refresh_token'),
       }),
-  })
-
+    })
   }
 </script>

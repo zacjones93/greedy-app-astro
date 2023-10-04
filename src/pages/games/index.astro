@@ -17,13 +17,24 @@ const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new D
 ---
 <Layout title="games">
   <main class=" max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold">Your Games In Progress</h1>
-    <div class="flex gap-4 mt-4">
+    <h1 class="text-3xl font-bold">Welcome to Greedy App</h1>
+    <p class="text-gray-500 mt-2">You can use this app to track the games you play</p>
+    <div class="space-y-2">
+      <h2 class="text-2xl font-bold mt-8">Create a New Game</h2>
+    <a 
+      class=" block mt-8 border w-fit p-8 bg-blue-500 rounded text-white hover:cursor-pointer hover:bg-blue-300 hover:border hover:border-blue-500 transition-all" 
+      href="/games/new"
+    >
+    Create New Game</a>
+    </div>
+    
+
+    <h2 class="text-2xl font-bold mt-8">Your Games In Progress</h2>
+    <div class="grid grid-cols-3 gap-2 mt-4">
       {data && sortedData ? sortedData.map((game) => {
-        
         return (
           <a 
-            class="border border-gray-50 w-fit p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer"
+            class="border border-gray-50 col-span-1 p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer transition-all"
             href={`/games/${game.id}`}
           >
             <h2 class=" text-xl">{game.type}</h2>

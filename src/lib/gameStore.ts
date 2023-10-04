@@ -4,13 +4,13 @@ import {v4}  from 'uuid';
 import { createGameinDatabase } from './database';
 
 export type GameState = "setUp" | "inProgress" | "complete";
-export type GameType = "greedy" | "farkle" | "10 crowns";
-export type GameObject = { id: string, state: GameState; scores: any; winner: string; gameType: string; players: string[] | never[]; }
+export type type = "greedy" | "farkle" | "10 crowns";
+export type GameObject = { id: string, state: GameState; scores: any; winner: string; type: string; players: string[] | never[]; }
 
 const gameObject = {
 	state: "setUp",
 	winner: "",
-  gameType: "greedy",
+  type: "greedy",
 	scores: {
   },
   players: []
@@ -31,7 +31,7 @@ export const game = map<Record<string, GameObject>>({});
     "29c77bcf-2a3d-4184-be8c-eb630616558e": {
         "state": "inProgress",
         "winner": "",
-        "gameType": "greedy",
+        "type": "greedy",
         "scores": {
             "zac": [
                 0,
@@ -60,7 +60,7 @@ export const resumeGame = (gameId: string, newGame: GameObject) => {
   let currentGame = game.get()[gameId];
 }
 
-export const createGame = (setUpFormValues: any, accessToken: string) => {
+export const createGame = async (setUpFormValues: any, accessToken: string) => {
   let scores = setUpFormValues
     .filter((player: any) => !!player?.name)
     .reduce((acc: any, player: any) => {
@@ -77,7 +77,8 @@ export const createGame = (setUpFormValues: any, accessToken: string) => {
       id
 		});
 
-    createGameinDatabase({id, gameType: gameObject.gameType, scores, accessToken})
+    return await createGameinDatabase({id, type: gameObject.type, scores, accessToken})
+
 }
 
 export const addScore = (gameId: string, scores: {[key: string]: number[]}) => {

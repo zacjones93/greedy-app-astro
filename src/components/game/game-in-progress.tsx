@@ -4,6 +4,7 @@ import cx from "classnames";
 import { useStore } from "@nanostores/react";
 import { GameObject, addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
 import { saveGameById } from "@lib/database";
+import { Toaster } from "react-hot-toast";
 
 const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: string}) => {
   const $gameRecord = useStore(gameStore)
@@ -96,121 +97,127 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
 
   const scoresMap = game?.scores ? Object.keys(game?.scores) : []
 
+  console.log({game})
+
   return (game ? (
-    <div className="h-full w-full max-w-sm flex gap-2">
+    <div className="h-full w-full max-w-3xl">
+      <Toaster />
       {/* <div>State: {JSON.stringify(editScore)}</div>
       <div>State: {JSON.stringify(playerColumn)}</div> */}
-      {scoresMap.map((playerScore: any) => {
-        return (
-          <div className="" key={playerScore}>
-            
-            <div className="mb-2 sm:mb-8 w-full">
-              <div className=" border-b-2 w-full">
-              <div className="flex justify-between">
-                <div className="flex gap-2">
-                  <h2 className="text-3xl sm:text-xl text-center">{playerScore}</h2>
-                    <div className="relative self-center group cursor-pointer sm:cursor-default ">
-                      <DetailIcon className=" sm:hidden h-5 w-5"/>
-                      <div className=" left-12 opacity-0 group-hover:opacity-100 select-none sm:group-hover:opacity-0 duration-300 absolute inset-0 z-10 flex justify-center items-center text-xs text-black font-semibold bg-opacity-50 rounded bg-white">score details</div>
-                    </div>
+      <h1 className=" text-3xl my-4 ">{game.type}</h1>
+      <div className="flex gap-2">
+        {scoresMap.map((playerScore: any) => {
+          return (
+            <div className="" key={playerScore}>
+              
+              <div className="mb-2 sm:mb-8 w-full">
+                <div className=" border-b-2 w-full">
+                <div className="flex justify-between">
+                  <div className="flex gap-2">
+                    <h2 className="text-3xl sm:text-xl text-center">{playerScore}</h2>
+                      <div className="relative self-center group cursor-pointer sm:cursor-default ">
+                        <DetailIcon className=" sm:hidden h-5 w-5"/>
+                        <div className=" left-12 opacity-0 group-hover:opacity-100 select-none sm:group-hover:opacity-0 duration-300 absolute inset-0 z-10 flex justify-center items-center text-xs text-black font-semibold bg-opacity-50 rounded bg-white">score details</div>
+                      </div>
+                  </div>
+                  <p className="text-3xl sm:text-lg text-center md:hidden">{currentPlayerScores[playerScore]}</p>
                 </div>
-                <p className="text-3xl sm:text-lg text-center md:hidden">{currentPlayerScores[playerScore]}</p>
-              </div>
-              <form onSubmit={handleSubmit} id={`${playerScore}-form`} className="mt-4 w-full">
-                <input
-                  className="w-full py-2 bg-gray-50 text-black rounded px-4 "
-                  placeholder={`enter score...`}
-                  id={playerScore}
-                  onChange={handleChange}
-                  value={gameInput[playerScore] || ""}
-                  type="number"
-                  step={50}
-                />
-              </form>
-              </div>
-              <ul className="flex-col md:flex hidden mt-4">
-                {game.scores[playerScore].map((score: number, i: number) => {
-                  let currentScore = displayScores[playerScore][i]
-                  return (
-                    <li className="relative text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}
-                      onClick={() => {
-                        
-                        setPlayerColumn(`${playerScore}-${score}-${i}`)
-                      }}
-                    >
-                      <div
-                        key={`${playerScore}-${score}-${i}-edit`}
-                        className={cx("h-8 text-gray-500 font-mono font-bold text-xs self-center px-2 py-1 rounded mr-8 cursor-pointer hover:bg-gray-200", {
-                          "hidden": score === 0,
-                        })}
-                        onClick={(e) => {
-                          console.log(e.currentTarget.getAttribute('id'));
-                          setEditScore({score, indexToEdit: i, player: playerScore})
+                <form onSubmit={handleSubmit} id={`${playerScore}-form`} className="mt-4 w-full">
+                  <input
+                    className="w-full py-2 bg-gray-50 text-black rounded px-4 "
+                    placeholder={`enter score...`}
+                    id={playerScore}
+                    onChange={handleChange}
+                    value={gameInput[playerScore] || ""}
+                    type="number"
+                    step={50}
+                  />
+                </form>
+                </div>
+                <ul className="flex-col md:flex hidden mt-4">
+                  {game.scores[playerScore].map((score: number, i: number) => {
+                    let currentScore = displayScores[playerScore][i]
+                    return (
+                      <li className="relative text-lg w-fit self-end flex " key={`${playerScore}-${score}-${i}`}
+                        onClick={() => {
+                          
+                          setPlayerColumn(`${playerScore}-${score}-${i}`)
                         }}
-                      >+{score}</div>
-                      <div className={cx("absolute -left-[5.5rem] flex flex-row gap-2", {
-                            "hidden": playerColumn !== `${playerScore}-${score}-${i}`,
-                          })}>
-                        <div className=" flex gap-1">
-                          <button type="submit"
-                            className={cx("h-8 w-8 text-center bg-green-200 text-black rounded border-2 border-gray-500 ", {
-                              "hidden": editScore.indexToEdit !== i,
-                            })}
-                            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                              e.preventDefault()
-                              handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
-                              setEditScore({score: "", indexToEdit: null, player: playerScore})
-                            }}
-                            >&#10003;</button>
-                          <button type="submit"
-                            className={cx("h-8 w-8 text-center bg-red-200 text-black rounded border-2 border-gray-500", {
-                              "hidden": editScore.indexToEdit !== i,
-                            })}
-                            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                              e.preventDefault()
-                              setEditScore({score: "", indexToEdit: null, player: ""})
-                              setPlayerColumn("")
-                            }}
-                            >x</button>
-                        </div>
-                        <input 
-                          type="number"
-                          className={cx(" w-24 h-8 text-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500", {
-                            "hidden": editScore.indexToEdit !== i,
-                          }) }
-                          value={editScore.score as number}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditScore({score: parseInt(e.target.value), indexToEdit: i, player: playerScore})}
-                          onSubmit={(e: React.FormEvent<HTMLInputElement>) => {
-                            e.preventDefault()
-                            handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: ""})
-                          }}
-                          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === "Enter") {
-                              handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
-                              setEditScore({score: "", indexToEdit: null, player: ""})
-                            }
-                          }}
-                          step={50}
-                        />
-                      </div>
-                      
-                      <div
-                        className={cx(" w-16 cursor-default", {
-                          "hidden": currentScore === 0,
-                        })
-                        }
                       >
-                        <div className="w-fit float-right">
-                          {currentScore}
+                        <div
+                          key={`${playerScore}-${score}-${i}-edit`}
+                          className={cx("h-8 text-gray-500 font-mono font-bold text-xs self-center px-2 py-1 rounded mr-8 cursor-pointer hover:bg-gray-200", {
+                            "hidden": score === 0,
+                          })}
+                          onClick={(e) => {
+                            console.log(e.currentTarget.getAttribute('id'));
+                            setEditScore({score, indexToEdit: i, player: playerScore})
+                          }}
+                        >+{score}</div>
+                        <div className={cx("absolute -left-[5.5rem] flex flex-row gap-2", {
+                              "hidden": playerColumn !== `${playerScore}-${score}-${i}`,
+                            })}>
+                          <div className=" flex gap-1">
+                            <button type="submit"
+                              className={cx("h-8 w-8 text-center bg-green-200 text-black rounded border-2 border-gray-500 ", {
+                                "hidden": editScore.indexToEdit !== i,
+                              })}
+                              onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                e.preventDefault()
+                                handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                                setEditScore({score: "", indexToEdit: null, player: playerScore})
+                              }}
+                              >&#10003;</button>
+                            <button type="submit"
+                              className={cx("h-8 w-8 text-center bg-red-200 text-black rounded border-2 border-gray-500", {
+                                "hidden": editScore.indexToEdit !== i,
+                              })}
+                              onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                e.preventDefault()
+                                setEditScore({score: "", indexToEdit: null, player: ""})
+                                setPlayerColumn("")
+                              }}
+                              >x</button>
+                          </div>
+                          <input 
+                            type="number"
+                            className={cx(" w-24 h-8 text-center bg-gray-50 text-black rounded py-2 px-4 border-2 border-gray-500", {
+                              "hidden": editScore.indexToEdit !== i,
+                            }) }
+                            value={editScore.score as number}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditScore({score: parseInt(e.target.value), indexToEdit: i, player: playerScore})}
+                            onSubmit={(e: React.FormEvent<HTMLInputElement>) => {
+                              e.preventDefault()
+                              handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: ""})
+                            }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                              if (e.key === "Enter") {
+                                handleEditScore({score: editScore.score as number, indexToEdit: editScore.indexToEdit as number, player: playerScore})
+                                setEditScore({score: "", indexToEdit: null, player: ""})
+                              }
+                            }}
+                            step={50}
+                          />
                         </div>
-                      </div>
-                    </li>);
-                })}
-              </ul>
+                        
+                        <div
+                          className={cx(" w-16 cursor-default", {
+                            "hidden": currentScore === 0,
+                          })
+                          }
+                        >
+                          <div className="w-fit float-right">
+                            {currentScore}
+                          </div>
+                        </div>
+                      </li>);
+                  })}
+                </ul>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>)
   : null) 
 }

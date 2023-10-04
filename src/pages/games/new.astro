@@ -1,0 +1,16 @@
+---
+import CreateGame from "@components/game/create-game";
+import Layout from "@layouts/Layout.astro";
+import { getUser } from "@lib/auth";
+
+const {user, accessToken} = await getUser(Astro.request) || {user: null, accessToken: null};
+const userId = user?.id
+
+if (!userId || !accessToken) {
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Create Game" >
+  <CreateGame client:only="react" accessToken={accessToken} />
+</Layout>
