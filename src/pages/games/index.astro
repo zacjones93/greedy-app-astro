@@ -1,8 +1,9 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import {getAllGamesByUser} from "@lib/database";
+import {deleteGameById, getAllGamesByUser} from "@lib/database";
 import {getUser} from "@lib/auth";
 import type { Image } from "astro:assets";
+
 
 const user = await getUser(Astro.request);
 const userId = user?.user?.id
@@ -21,40 +22,62 @@ const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new D
     <p class="text-gray-500 mt-2">You can use this app to track the games you play</p>
     <div class="space-y-2">
       <h2 class="text-2xl font-bold mt-8">Create a New Game</h2>
-    <a 
-      class=" block mt-8 border w-fit p-8 bg-blue-500 rounded text-white hover:cursor-pointer hover:bg-blue-300 hover:border hover:border-blue-500 transition-all" 
+    <a
+      class=" block mt-8 border w-fit p-8 bg-blue-500 rounded text-white hover:cursor-pointer hover:bg-blue-300 hover:border hover:border-blue-500 transition-all"
       href="/games/new"
     >
     Create New Game</a>
     </div>
-    
+
 
     <h2 class="text-2xl font-bold mt-8">Your Games In Progress</h2>
     <div class="grid grid-cols-3 gap-2 mt-4">
       {data && sortedData ? sortedData.map((game) => {
         return (
-          <a 
-            class="border border-gray-50 col-span-1 p-8 bg-gray-700 rounded text-white hover:bg-gray-500 hover:cursor-pointer transition-all"
-            href={`/games/${game.id}`}
-          >
-            <h2 class=" text-xl">{game.type}</h2>
-            <p class="text-md text-gray-300">{new Date(game.created_at).toLocaleDateString()}</p>
+          <div class="col-span-1 bg-gray-700 border-gray-50 text-white hover:bg-gray-500 hover:cursor-pointer transition-all relative group border p-4 ">
+            <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id="deleteGameButton" data-game-id={game.id} >❌</button>
+            <a
+              class="  rounded "
+              href={`/games/${game.id}`}
+            >
 
-            <h3>Player Scores</h3>
-            <ul class="flex gap-2">
-              
-              {Object.keys(game.scores).map((player) => {
-                return (
-                  <li>
-                    <h2>{player}</h2>
-                    <div class="flex flex-col">{game.scores[player].map((score: number[]) => {
-                      return <div>{score}</div>
-                    })}</div>
-                  </li>
-              )})}
-            </ul>
-          </a>
+              <h2 class=" text-xl">{game.type}</h2>
+              <p class="text-md text-gray-300">{new Date(game.created_at).toLocaleDateString()}</p>
+
+              <h3>Player Scores</h3>
+              <ul class="flex gap-2">
+
+                {Object.keys(game.scores).map((player) => {
+                  return (
+                    <li>
+                      <h2>{player}</h2>
+                      <div class="flex flex-col">{game.scores[player].map((score: number[]) => {
+                        return <div>{score}</div>
+                      })}</div>
+                    </li>
+                )})}
+              </ul>
+            </a>
+        </div>
         )}) : <p>You don't have any games yet...</p>}
       </div>
     </main>
 </Layout>
+
+
+<script>
+  import {deleteGameById} from "@lib/database";
+
+  async function handleClick ({target}: {target: any}) {
+
+    let data = await fetch("/api/games/delete", {
+      method: "DELETE",
+      body: JSON.stringify({
+        gameId: target.dataset.gameId
+      })
+    })
+    document.location.reload()
+  }
+  document.getElementById("deleteGameButton")?.addEventListener("click", handleClick);
+
+</script>
