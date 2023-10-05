@@ -9,6 +9,9 @@ export default defineConfig({
   output: 'server',
   integrations: [tailwind(), react()],
   adapter: vercel(),
+  resolve: {
+    alias: [{ find: "@", replacement: "/src" }],
+  },
   build:{
     outDir: "build"
   }
