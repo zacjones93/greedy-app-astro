@@ -11,16 +11,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^2.2.1",
-    "@astrojs/tailwind": "^4.0.0",
-    "@astrojs/vercel": "3.8.2",
+    "@astrojs/react": "^3.0.3",
+    "@astrojs/tailwind": "^5.0.1",
+    "@astrojs/vercel": "^5.0.2",
     "@nanostores/react": "^0.7.1",
     "@supabase/supabase-js": "^2.26.0",
     "@tailwindcss/container-queries": "^0.1.1",
     "@types/cookie": "^0.5.1",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
-    "astro": "^2.10.10",
+    "astro": "^3.2.3",
     "classnames": "^2.3.2",
     "cookie": "^0.5.0",
     "encrypt-with-password": "^1.0.0",
@@ -30,6 +30,7 @@
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "^3.3.2",
+    "typescript": "^5.2.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

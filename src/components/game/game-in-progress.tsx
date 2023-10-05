@@ -2,7 +2,8 @@ import { useState, useReducer, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import cx from "classnames";
 import { useStore } from "@nanostores/react";
-import { GameObject, addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
+import { addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
+import type {GameObject } from "@lib/gameStore";
 import { saveGameById } from "@lib/database";
 import { Toaster } from "react-hot-toast";
 
@@ -97,8 +98,6 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
 
   const scoresMap = game?.scores ? Object.keys(game?.scores) : []
 
-  console.log({game})
-
   return (game ? (
     <div className="h-full w-full min-h-screen font-mono  max-w-3xl p-4">
       <Toaster />
@@ -149,7 +148,6 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
                             "hidden": score === 0,
                           })}
                           onClick={(e) => {
-                            console.log(e.currentTarget.getAttribute('id'));
                             setEditScore({score, indexToEdit: i, player: playerScore})
                           }}
                         >+{score}</div>

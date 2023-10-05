@@ -35,23 +35,23 @@ const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new D
     <div class="grid sm:grid-cols-3 gap-2 mt-4">
       {data && data?.length > 0 && sortedData ? sortedData.map((game) => {
         return (
-          <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group p-4 ">
+          <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group px-4 pb-4">
             <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id="deleteGameButton" data-game-id={game.id} >❌</button>
             <a
               class="  rounded "
               href={`/games/${game.id}`}
             >
-
-              <h2 class=" text-xl">{game.type}</h2>
-              <p class="text-md text-gray-700">{new Date(game.created_at).toLocaleDateString()}</p>
-
-              <h3>Player Scores</h3>
-              <ul class="flex gap-2">
-
+              <div class="flex justify-between my-2">
+                <h2 class=" text-xl ">{game.type}</h2>
+              <p class="text-md text-gray-700 self-center">{new Date(game.created_at).toLocaleDateString()}</p>
+              </div>
+            
+              <h3 class="text-center" >Player Scores</h3>
+              <ul class="flex justify-evenly gap-2">
                 {Object.keys(game.scores).map((player) => {
                   return (
                     <li>
-                      <h2>{player}</h2>
+                      <h2 class=" font-semibold">{player}</h2>
                       <div class="flex flex-col">{game.scores[player].map((score: number[]) => {
                         return <div>{score}</div>
                       })}</div>
