@@ -2,7 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import { Toaster } from "react-hot-toast";
 
-import Game from "@components/game/game";
+// import Game from "@components/game/game";
 import { getUser } from "@lib/auth";
 
 
@@ -22,7 +22,7 @@ if (!session) {
 
 <Layout title="Welcome to Astro.">
   <main class="max-w-4xl mx-auto">
-    {
+    <!-- {
       user !== null ? (
         <Game client:load accessToken={accessToken || ""} />
       ) : (
@@ -43,7 +43,8 @@ if (!session) {
           <span class="">already signed up? <a href="/login" class="text-black underline">Log in</a></span>
         </div>
       )
-    }
+    } -->
+    main
   </main>
 </Layout>
 
