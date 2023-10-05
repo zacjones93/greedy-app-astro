@@ -12,10 +12,4 @@ export default defineConfig({
   adapter: node({
     mode: "standalone"
   }),
-  build: {
-    minify: true,
-    ssr: true,
-    sourcemap: true,
-    out: "dist"
-  }
 });
