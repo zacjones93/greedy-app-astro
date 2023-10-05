@@ -10,13 +10,4 @@ export default defineConfig({
   output: 'server',
   integrations: [tailwind(), react()],
   adapter: vercel(),
-  build:{
-    outDir: "build",
-    rollupOptions: {
-      external: [
-          "react", // ignore react stuff
-          "react-dom",
-      ],
-  }
-  }
 });
