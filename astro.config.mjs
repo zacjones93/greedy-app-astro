@@ -10,9 +10,9 @@ export default defineConfig({
   integrations: [tailwind(), react()],
   adapter: vercel(),
   resolve: {
-    alias: [{ find: "@", replacement: "/src" }],
-  },
-  build:{
-    outDir: "build"
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "@tests": path.resolve(__dirname, "./tests")
+    }
   }
 });
