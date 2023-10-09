@@ -5,10 +5,10 @@ import GameInProgress from '@components/game/game-in-progress'
 import { Toaster } from 'react-hot-toast';
 import { getUser } from '@lib/auth';
 
-const user = await getUser(Astro.request);
-const userId = user?.user?.id
+const {user, accessToken} = await getUser(Astro.request) || {user: null, accessToken: null};
+const userId = user?.id
 
-if (!userId) {
+if (!userId || !accessToken) {
   return Astro.redirect("/login");
 }
 
@@ -25,6 +25,6 @@ if (!game) {
 <Layout title='Current Greedy Game'>
   <Toaster />
   <div class="max-w-3xl mx-auto">
-    <GameInProgress client:only="react" slug={slug} currentGame={game} />
+    <GameInProgress client:only="react" slug={slug} currentGame={game} accessToken={accessToken} />
   </div>
 </Layout>

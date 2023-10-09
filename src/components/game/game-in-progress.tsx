@@ -4,20 +4,12 @@ import cx from "classnames";
 import { useStore } from "@nanostores/react";
 import { addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
 import type {GameObject } from "@lib/gameStore";
-import { saveGameById } from "@lib/database";
 import { Toaster } from "react-hot-toast";
 
-const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: string}) => {
+const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObject, slug?: string, accessToken?: string }) => {
   const $gameRecord = useStore(gameStore)
   const gameId = Object.keys($gameRecord)?.slice(-1)[0]
   const game = $gameRecord[gameId]
-
-  useEffect(() => {
-    if (slug && currentGame) {
-      resumeGame(slug, currentGame)
-    }
-  }, [])
-
   
   let [editScore, setEditScore] = useState<{score: number | ""; indexToEdit: number | null; player: string;}>({score: "", indexToEdit: null, player: ""})
   let [playerColumn, setPlayerColumn] = useState<string>("")
@@ -28,10 +20,27 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
 	);
 
 	const gameScores = game?.scores;
-  
+
+
   useEffect(() => {
+    if (slug && currentGame) {
+      resumeGame(slug, currentGame)
+    }
+  }, [])
+
+  useEffect( () => {
     (async () => {
-      await saveGameById(gameId, gameScores)
+      const data = await fetch("/api/games/save", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          gameId,
+          scores: gameScores,
+          accessToken
+        })
+      })
     })()
   }, [gameScores])
 
@@ -66,13 +75,12 @@ const GameInProgress = ({currentGame, slug}: {currentGame?: GameObject, slug?: s
 	// }
 	// , [game])
 
-	const handleSubmit = (e: any) => {
+	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
 		let newScoresFromRound = Object.keys(gameInput).filter(
 			(inputKey: any) => !!gameInput[inputKey]
 		);
-
 		newScoresFromRound.forEach((player: any) => {
 			let currentScoreArray = game.scores[player];
 			let newScore = parseInt(gameInput[player])
