@@ -1,26 +1,39 @@
 
-import {deleteGameById} from "@lib/database";
+import { createClient } from "@supabase/supabase-js";
 import type { APIRoute } from "astro";
 
 
 export const DELETE: APIRoute = async ({redirect, request, cookies}) => { 
-  let {gameId} = await request?.json()
+  let {gameId, accessToken} = await request?.json()
 
-  const {data, error} = gameId ? await deleteGameById(gameId) : { data: null, error: {
-      message: "No game id provided"
-    } }
+  const supabase = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL, 
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY, {global: { headers: {
+      Authorization: `Bearer ${accessToken}`
+  }}})
+  const {
+    data: { user },
+  } = await supabase.auth.getUser(accessToken);
 
-  if (error) {
+  if (user) {
+    const { data, error } = await supabase
+    .from('games')
+    .delete()
+    .eq('id', gameId)
+        
+    if (error) {
+      return new Response(JSON.stringify({
+        data: error.message
+      }), {status: 500})
+    }
+    
     return new Response(JSON.stringify({
-      status: 500,
-      data: error
-    }))
+      data
+    }), {status: 200})
   }
 
   return new Response(JSON.stringify({
-    status: 200,
-    data
-  }))
-
+    data: "user not found"
+  }), {status: 500})
 }
 
