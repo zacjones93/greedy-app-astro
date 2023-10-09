@@ -13,7 +13,7 @@ if (!userId || !accessToken) {
 }
 
 const { slug } = Astro.params
-const {data, error} = slug ? await getGameById(slug) : {data: null, error: null}
+const {data, error} = slug ? await getGameById(slug, accessToken) : {data: null, error: null}
 const game = data ? data[0] : null
 
 if (!game) {
