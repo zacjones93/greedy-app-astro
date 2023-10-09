@@ -1,23 +1,4 @@
-import { getUser } from "./auth"
 import { supabase } from "./supabase"
-
-
-export const createGameinDatabase = async ({id, type, scores, accessToken}: {id: string, type: string, scores: any, accessToken: string}) => {
-  
-  const {
-    data: { user },
-  } = await supabase.auth.getUser(accessToken);
-
-  if (user) {
-    let {data, error} =  await supabase.from('games').insert([
-      { id: String(id), type, scores, user_id: user.id, state: "inProgress" }
-    ]).select()
-
-    return {data, error}
-  }
-  
-  return {data: null, error: "No user"}
-}
 
 export const saveGameById = async (gameId: string, scores: any) => {
   const { data, error } = await supabase

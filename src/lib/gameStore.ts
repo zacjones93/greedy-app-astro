@@ -1,7 +1,6 @@
 import { atom, map } from 'nanostores';
 import { toast } from 'react-hot-toast';
 import {v4}  from 'uuid';
-import { createGameinDatabase } from './database';
 
 export type GameState = "setUp" | "inProgress" | "complete";
 export type type = "greedy" | "farkle" | "10 crowns";
@@ -58,27 +57,6 @@ export const resumeGame = (gameId: string, newGame: GameObject) => {
   })
 
   let currentGame = game.get()[gameId];
-}
-
-export const createGame = async (setUpFormValues: any, accessToken: string) => {
-  let scores = setUpFormValues
-    .filter((player: any) => !!player?.name)
-    .reduce((acc: any, player: any) => {
-      acc[player.name] = [0];
-      return acc;
-    }, {});
-
-    const id = v4();
-
-    game.setKey(id, {
-      ...gameObject,
-			state: "inProgress",
-			scores,
-      id
-		});
-
-    return await createGameinDatabase({id, type: gameObject.type, scores, accessToken})
-
 }
 
 export const addScore = (gameId: string, scores: {[key: string]: number[]}) => {

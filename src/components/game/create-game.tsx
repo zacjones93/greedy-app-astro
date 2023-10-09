@@ -1,5 +1,6 @@
-import { createGame } from "@lib/gameStore";
 import { useState } from "react";
+import {v4}  from 'uuid';
+
 
 const CreateGame = ({accessToken}: 
 {
@@ -9,9 +10,29 @@ const CreateGame = ({accessToken}:
 
   const handleCreationSubmit = async (e: any) => {
     e.preventDefault();
-    const {data, error} = await createGame(setUpFormValues, accessToken)
-    const gameSlug = data ? data[0].id : null
-    
+    let scores = setUpFormValues
+    .filter((player: any) => !!player?.name)
+    .reduce((acc: any, player: any) => {
+      acc[player.name] = [0];
+      return acc;
+    }, {});
+
+    const id = v4();
+
+    const data = await fetch("/api/games/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id,
+        type: 'greedy',
+        scores,
+        accessToken
+      })
+    })
+    const gameSlug = await data.json()
+   
     if (gameSlug) {
       document.location.assign(`/games/${gameSlug}`)
     }
