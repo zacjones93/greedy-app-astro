@@ -52,9 +52,9 @@ const gameIds = data?.map((game) => game.id)
                   return (
                     <li>
                       <h2 class=" font-semibold">{player}</h2>
-                      <div class="flex flex-col">{game.scores[player].map((score: number[]) => {
-                        return <div>{score}</div>
-                      })}</div>
+                      <div class="flex flex-col">
+                        {game.scores[player].reduce((acc: number, cur: number) => acc + cur, 0)}
+                      </div>
                     </li>
                 )})}
               </ul>
