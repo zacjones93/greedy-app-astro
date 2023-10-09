@@ -2,6 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import {getAllGamesByUser} from "@lib/database";
 import {getUser} from "@lib/auth";
+import cx from "classnames";
 import type { Image } from "astro:assets";
 
 
@@ -13,7 +14,8 @@ if (!userId) {
 }
 
 const {data, error} = userId && accessToken ? await getAllGamesByUser(userId, accessToken) : {data: [], error: null}
-const sortedData = data?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+const gamesInProgress = data?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).filter((game) => game.state === "inProgress")
+const completedGames = data?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).filter((game) => game.state === "complete")
 const gameIds = data?.map((game) => game.id)
 
 ---
@@ -33,7 +35,7 @@ const gameIds = data?.map((game) => game.id)
 
     <h2 class="text-2xl font-bold mt-8">Your Games In Progress</h2>
     <div class="grid sm:grid-cols-3 gap-2 mt-4">
-      {data && data?.length > 0 && sortedData ? sortedData.map((game) => {
+      {data && data?.length > 0 && gamesInProgress ? gamesInProgress.map((game) => {
         return (
           <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group px-4 pb-4">
             <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id={`deleteGameButton-${game.id}`} data-game-id={game.id} >❌</button>
@@ -62,6 +64,40 @@ const gameIds = data?.map((game) => game.id)
         </div>
         )}) : <p>You don't have any games yet...</p>}
       </div>
+
+      <h2 class="text-2xl font-bold mt-8">Completed Games</h2>
+      <div class="grid sm:grid-cols-3 gap-2 mt-4">
+        {data && data?.length > 0 && completedGames ? completedGames.map((game) => {
+          return (
+            <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group px-4 pb-4">
+              <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id={`deleteGameButton-${game.id}`} data-game-id={game.id} >❌</button>
+              <a
+                class="  rounded "
+                href={`/games/${game.id}`}
+              >
+                <div class="flex justify-between my-2">
+                  <h2 class=" text-xl ">{game.type}</h2>
+                <p class="text-md text-gray-700 self-center">{new Date(game.created_at).toLocaleDateString()}</p>
+                </div>
+              
+                <h3 class="text-center" >Player Scores</h3>
+                <ul class="flex justify-evenly gap-2">
+                  {Object.keys(game.scores).map((player) => {
+                    return (
+                      <li>
+                        <h2 class={cx("font-medium", {
+                            "underline": player === game.winner,
+                          })}>{player === game.winner ? <span class="font-bold">{player}🎉</span> : player}</h2>
+                        <div class="flex flex-col">
+                          {game.scores[player].reduce((acc: number, cur: number) => acc + cur, 0)}
+                        </div>
+                      </li>
+                  )})}
+                </ul>
+              </a>
+          </div>
+          )}) : <p>You don't have any games yet...</p>}
+        </div>
     </main>
 </Layout>
 

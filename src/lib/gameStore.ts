@@ -101,3 +101,13 @@ export const editScore = ({gameId, score, indexToEdit, player}: {gameId: string,
     }
   })
 }
+
+export const completeGame = (gameId: string, winner: string) => {
+  let currentGame = game.get()[gameId];
+
+  game.setKey(gameId, {
+    ...currentGame,
+    state: "complete",
+    winner
+  })
+}

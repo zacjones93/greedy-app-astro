@@ -1,19 +1,24 @@
-import { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import cx from "classnames";
 import { useStore } from "@nanostores/react";
-import { addScore, editScore as editStoreScore, game as gameStore, resumeGame } from "@lib/gameStore";
+import { addScore, editScore as editStoreScore, game as gameStore, resumeGame, completeGame } from "@lib/gameStore";
 import type {GameObject } from "@lib/gameStore";
 import { Toaster } from "react-hot-toast";
 import * as Collapsible from '@radix-ui/react-collapsible';
-import { RowSpacingIcon, Cross2Icon } from '@radix-ui/react-icons';
-import React from "react";
+import * as Select from '@radix-ui/react-select';
+import { RowSpacingIcon, Cross2Icon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
+import { S } from "dist/server/chunks/astro_5ea13e3c.mjs";
+
 
 const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObject, slug?: string, accessToken?: string }) => {
   const $gameRecord = useStore(gameStore)
   const gameId = Object.keys($gameRecord)?.slice(-1)[0]
   const game = $gameRecord[gameId]
-  
+	const gameScores = game?.scores;
+  const players = Object.keys(gameScores || {})
+  const gameState = game?.state
+  const gameIsComplete = gameState === "complete"
   
 
   const [gameInput, setGameInput] = useReducer(
@@ -21,8 +26,8 @@ const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObj
 		{}
 	);
 
-	const gameScores = game?.scores;
 
+  console.log({players})
 
   useEffect(() => {
     if (slug && currentGame) {
@@ -67,15 +72,6 @@ const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObj
       [curr]: displayScores[curr].slice(-1).pop()
     }
   }, {})
-	// useEffect(() => {
-	//   console.log("game scores", gameScores)
-	//   players.map((player: any) => {
-	//     let currentScore = gameScores[player].slice(-1).pop()
-
-	//     if (currentScore >= 10000)
-	//   })
-	// }
-	// , [game])
 
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
@@ -114,6 +110,11 @@ const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObj
       {/* <div>State: {JSON.stringify(editScore)}</div>
       <div>State: {JSON.stringify(playerColumn)}</div> */}
       <h1 className=" text-3xl my-4 ">{game.type}</h1>
+      <div className="my-4">
+        {!gameIsComplete ? <SelectWinner players={players} accessToken={accessToken} gameId={gameId} /> : <div className="flex flex-col gap-2">
+          <p>Your winner is <span className="border-b-2 border-green-300 font-bold">{game.winner}</span> 🎉</p>
+          <a href="/games/new" className="text-sm underline">Start a new game?</a></div>}
+      </div>
       <div className="flex flex-col sm:flex-row gap-4">
         {scoresMap.map((playerScore: any) => {
           return (
@@ -133,7 +134,8 @@ const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObj
                 </div>
                 <form onSubmit={handleSubmit} id={`${playerScore}-form`} className="mt-4 w-full">
                   <input
-                    className="w-full py-2 bg-gray-50 text-black rounded px-4 "
+                    disabled={gameIsComplete}
+                    className="w-full py-2 bg-gray-50 text-black rounded px-4 disabled:bg-gray-200"
                     placeholder={`enter score...`}
                     id={playerScore}
                     onChange={handleChange}
@@ -252,7 +254,7 @@ const CollapsibleScore = ({totalScore, game, playerScore, displayScores, handleE
   displayScores: any,
   handleEditScore: any, 
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <Collapsible.Root className="text-3xl sm:text-lg text-center md:hidden relative " open={open} onOpenChange={setOpen}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
@@ -266,13 +268,91 @@ const CollapsibleScore = ({totalScore, game, playerScore, displayScores, handleE
         </Collapsible.Trigger>
       </div>
       <Collapsible.Content>
-        <div className="absolute right-0 bg-gray-200 rounded-sm p-2 w-[240px]">
+        <div className="absolute z-10 right-0 bg-gray-200 rounded-sm p-2 w-[240px]">
           <GameScoresList game={game} playerScore={playerScore} displayScores={displayScores} handleEditScore={handleEditScore} />
         </div>
       </Collapsible.Content>
     </Collapsible.Root>
   );
 };
+
+const SelectWinner = ({players, gameId, accessToken}: {players: any, gameId: string, accessToken?: string}) => {
+  const [winner, setWinner] = useState<string>("")
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+
+    completeGame(gameId, winner)
+
+    const data = await fetch("/api/games/win", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        gameId,
+        winner,
+        accessToken
+      })
+    })
+  }
+
+  return (
+  <form className="flex gap-2" onSubmit={handleSubmit}>
+    <Select.Root onValueChange={setWinner}>
+      <Select.Trigger
+        className="p-2 min-w-[194.25px] inline-flex items-center justify-center rounded-sm border-2 border-none  leading-none gap-[5px] bg-white text-black outline-none"
+        aria-label="Players"
+      >
+        <Select.Value className="border-2 border-none" placeholder="Select a winner…" />
+        <Select.Icon className="text-black justify-self-end">
+          <ChevronDownIcon />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content className="overflow-hidden bg-white rounded-md ">
+          <Select.ScrollUpButton className="flex items-center justify-center border-2 border-none bg-white text-black cursor-default">
+            <ChevronUpIcon />
+          </Select.ScrollUpButton>
+          <Select.Viewport className="p-[5px]">
+            <Select.Group>
+              <Select.Label className="px-[25px] text-xs leading-[25px] text-black">
+                Players
+              </Select.Label>
+              <SelectItem value={null}>None</SelectItem>
+              {players.map((player: any) => (
+                <SelectItem value={player} key={player}>{player}</SelectItem>
+              ))}
+            </Select.Group>
+          </Select.Viewport>
+          <Select.ScrollDownButton className="flex items-center justify-center h-[25px] bg-white text-black cursor-default">
+            <ChevronDownIcon />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+
+    {winner ? <button type="submit" className="border-green-300 border-2 rounded-sm p-2">Submit</button> : null}
+  </form>
+)};
+
+const SelectItem = React.forwardRef(({ children, className, ...props }: {children: React.ReactNode, className?: string, value: any}, forwardedRef: any) => {
+  return (
+    <Select.Item
+      className={cx(
+        'text-[13px] leading-none text-black rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative select-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:outline-none cursor-pointer ',
+        className
+      )}
+      {...props}
+      ref={forwardedRef}
+    >
+      <Select.ItemText>{children}</Select.ItemText>
+      <Select.ItemIndicator className="absolute left-0 w-[25px] inline-flex items-center justify-center">
+        <CheckIcon />
+      </Select.ItemIndicator>
+    </Select.Item>
+  );
+});
 
 const DetailIcon = ({className}: {className: string}) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.0} stroke="currentColor" className={twMerge("w-4 h-4", className)}>
