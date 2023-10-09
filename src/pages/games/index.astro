@@ -35,7 +35,7 @@ const gameIds = data?.map((game) => game.id)
 
     <h2 class="text-2xl font-bold mt-8">Your Games In Progress</h2>
     <div class="grid sm:grid-cols-3 gap-2 mt-4">
-      {data && data?.length > 0 && gamesInProgress ? gamesInProgress.map((game) => {
+      {gamesInProgress && gamesInProgress?.length > 0 && gamesInProgress ? gamesInProgress.map((game) => {
         return (
           <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group px-4 pb-4">
             <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id={`deleteGameButton-${game.id}`} data-game-id={game.id} >❌</button>
@@ -67,7 +67,7 @@ const gameIds = data?.map((game) => game.id)
 
       <h2 class="text-2xl font-bold mt-8">Completed Games</h2>
       <div class="grid sm:grid-cols-3 gap-2 mt-4">
-        {data && data?.length > 0 && completedGames ? completedGames.map((game) => {
+        {completedGames && completedGames?.length > 0 && completedGames ? completedGames.map((game) => {
           return (
             <div class="col-span-1 border-2 border-black text-black hover:bg-gray-300 hover:cursor-pointer transition-all relative group px-4 pb-4">
               <button class="absolute top-4 right-4 z-10 hidden group-hover:block p-[5px]" id={`deleteGameButton-${game.id}`} data-game-id={game.id} >❌</button>
@@ -96,7 +96,7 @@ const gameIds = data?.map((game) => game.id)
                 </ul>
               </a>
           </div>
-          )}) : <p>You don't have any games yet...</p>}
+          )}) : <p>You haven't finished playing any games yet...</p>}
         </div>
     </main>
 </Layout>

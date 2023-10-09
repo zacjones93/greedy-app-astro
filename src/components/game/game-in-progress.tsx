@@ -25,8 +25,6 @@ const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObj
 	);
 
 
-  console.log({players})
-
   useEffect(() => {
     if (slug && currentGame) {
       resumeGame(slug, currentGame)
