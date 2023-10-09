@@ -8,8 +8,6 @@ import { Toaster } from "react-hot-toast";
 import * as Collapsible from '@radix-ui/react-collapsible';
 import * as Select from '@radix-ui/react-select';
 import { RowSpacingIcon, Cross2Icon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
-import { S } from "dist/server/chunks/astro_5ea13e3c.mjs";
-
 
 const GameInProgress = ({currentGame, slug, accessToken}: {currentGame?: GameObject, slug?: string, accessToken?: string }) => {
   const $gameRecord = useStore(gameStore)
