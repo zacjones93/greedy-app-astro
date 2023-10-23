@@ -83,7 +83,7 @@ The only table I have set up is `games`:
 
 ![games table](https://github.com/zacjones93/greedy-app-astro/assets/6188161/b5d5ad4e-df2e-4e9d-8bd8-29a5309f905f)
 
-I also haven't normalized the `scores` column and keeping game scores stored as json as a convenience knowing I will use and that data as intended throughout my application.
+I also haven't normalized the `scores` column and keeping game scores stored as json as a convenience knowing I will use and set that data as intended throughout my application.
 
 A game's scores end up looking like this:
 
@@ -106,7 +106,6 @@ Current folder structure of the application:
 ```
 /
 ├── public/
-│   └── favicon.svg
 ├── src/
 │   ├── components
 │   │   ├── Card.astro
